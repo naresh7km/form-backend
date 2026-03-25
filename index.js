@@ -3,28 +3,33 @@ const cors = require("cors");
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// ✅ FIX: Allow all origins + handle preflight
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json());
 
-// Home route (just to check server)
+// IMPORTANT: handle preflight manually
+app.options("*", cors());
+
+// Home route
 app.get("/", (req, res) => {
   res.send("Backend is running ✅");
 });
 
-// POST route to receive phone number
+// Form route
 app.post("/submit", (req, res) => {
   const { phone } = req.body;
 
-  // Check if phone exists
   if (!phone) {
     return res.status(400).json({ error: "Phone number is required" });
   }
 
-  // Print to console (you will see this in Render logs)
   console.log("New Phone Number Received:", phone);
 
-  // Always respond (even if frontend ignores it)
   res.status(200).json({ success: true });
 });
 
